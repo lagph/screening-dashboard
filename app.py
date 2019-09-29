@@ -24,7 +24,8 @@ for i in range(MAX_NUM_MODELS):
                                step=1e-4,
                                updatemode='drag',
                                )
-    div_children.append(html.Div([recall_title, recall_slider], className="six columns"))
+    recall_delete_button = html.Button(id=f'recall-delete-button-{i}', children='remove model')
+    div_children.append(html.Div([recall_title, recall_slider], className="four columns"))
     speci_title = html.Div(id=f'speci-title-{i}', children='Specificity')
     speci_slider = dcc.Slider(id=f'speci-slider-{i}',
                               min=0,
@@ -32,14 +33,16 @@ for i in range(MAX_NUM_MODELS):
                               step=1e-4,
                               updatemode='drag'
                               )
-    div_children.append(html.Div([speci_title, speci_slider], className="six columns"))
+    div_children.append(html.Div([speci_title, speci_slider], className="four columns"))
+    button = html.Button(id=f'remove-model-button-{i}', children='remove model', n_clicks=0)
+    div_children.append(html.Div(button, className="two columns"))
+    display_state_div = html.Div(id=f'dispaly-state-div{i}', style={'display': 'none'})
+    div_children.append(display_state_div)
     model_panel_children.append(html.Div(id=f'model-div-{i}', children=div_children,
                                          style={'display': 'none'}, className='row'))
 
-
 model_panel = html.Div(model_panel_children)
 app.layout = html.Div([model_buttons, model_panel])
-
 
 
 for i in range(MAX_NUM_MODELS):
@@ -61,6 +64,13 @@ for i in range(MAX_NUM_MODELS):
         else:
             ret.append("Specificity = " + str(speci)[:5])
         return ret
+
+    @app.callback(Output(component_id=f'model-div-{i}', component_property='style'),
+                  [Input(
+                      component_id=f'remove-model-button-{i}', component_property='n_clicks')],
+                  )
+    def remove_model(n_clicks):
+        return {'display': 'none'}
 
 
 @app.callback([Output(component_id=f'model-div-{i}', component_property='style')
